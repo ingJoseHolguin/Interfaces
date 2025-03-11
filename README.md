@@ -1,7 +1,6 @@
 # Actividades Interfaces Naturales
 
 
-
 ## Tabla de Contenidos
 - [Descripción](#descripción)
 - [Instalación](#instalación)
@@ -11,7 +10,7 @@
 
 ## Descripción
 
-descripcion feik
+Descripcion....
 
 ## Instalación
 
@@ -23,7 +22,7 @@ descripcion feik
 
 1. Clona este repositorio:
     ```bash
-    git clone https://github.com/usuario/
+    git clone https://github.com/ingJoseHolguin/Interfaces.git
     ```
 
 2. Navega a la carpeta del proyecto:
