@@ -26,27 +26,33 @@ import time
 
 if __name__ == "__main__": 
     # Definición de la gramática corregida
+    # grammar_text = """
+    # % start S
+    # S[SEM=<?vp(?np)>] -> NP[SEM=?np] VP[SEM=?vp]
+    # VP[SEM=?v] -> IV[SEM=?v]
+    # NP[SEM=<temerarios>] -> "temerarios"
+    # V[SEM=<\\x.reproduce(x)>] -> "reproduce"
+    # """
+
     grammar_text = """
     % start S
     S[SEM=<?vp(?np)>] -> NP[SEM=?np] VP[SEM=?vp]
-    VP[SEM=?v] -> IV[SEM=?v]
-    NP[SEM=<reproduce>] -> "reproduce"
-    IV[SEM=<\\x.temerarios(x)>] -> "temerarios"
+    VP[SEM=<?v(?np)>] -> V[SEM=?v] NP[SEM=?np]
+    NP[SEM=<computador>] -> "computador"
+    NP[SEM=<temerarios>] -> "temerarios"
+    V[SEM=<\\x.reproduce(x)>] -> "reproduce"
     """
 
-    # Cargar gramática y parser
     grammar = grammar.FeatureGrammar.fromstring(grammar_text)
     parser = parse.FeatureEarleyChartParser(grammar)
 
-    print("🎙️ Habla ahora... Reconociendo semántica")
+    print("🎙️ Habla ahora... ")
     lite.text_to_speech("Habla ahora...")
     
-    # Obtener la entrada de voz y convertir a texto
-    # text = recognition.trascribe_from_file(audio.file_voice()).strip()
-    text = "Reproduce temerarios"
+    # text = recognition.trascribe_from_file(audio.file_voice()).strip()  #uso de microfono
+    text = "computador Reproduce shakira"
     print("Entrada reconocida:", text.lower())
 
-    # Tokenizar la entrada y asegurar que esté en minúsculas
     tokens = text.lower().split()
     print("Tokens:", tokens)
 
@@ -62,25 +68,3 @@ if __name__ == "__main__":
     except ValueError as e:
         lite.text_to_speech("Comando no reconocido.")
         print(f"⚠️ Error: {e}")
-
-
-    
-
-   
-
-
-    
-
-    if trees:
-        # Si se encontraron árboles sintácticos, la entrada cumple con la gramática
-        for tree in trees:
-            print("Árbol sintáctico generado:", tree)
-            # Ejecutar acción si se cumple la gramática
-            if "temerarios" in tree.label()['SEM']:  # Verifica si contiene 'temerarios'
-                lite.text_to_speech("Reproduciendo temerarios")
-                print("🎵 Reproduciendo: temerarios")
-                pywhatkit.playonyt("temerarios")
-    else:
-        # Si no se encontró ninguna estructura válida en la gramática
-        lite.text_to_speech("No se reconoce el comando.")
-        print("⚠️ No se reconoce la entrada.")
