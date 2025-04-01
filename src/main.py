@@ -33,12 +33,11 @@ if __name__ == "__main__":
     print("Inicio")
     lite.text_to_speech("Hola, ¿en qué puedo ayudarte?")
     while True:
-        # Obtener texto reconocido (esto ya debe ser un string)
+        # Obtener texto reconocido
         usuario = recognition_lite.recognition_lite()
         print(f"Texto reconocido: {usuario}")
         
         if usuario != "":
-           # Enviar directamente la lista de mensajes
            respuestatexto = lmstudio.consultar_modelo(analizar_oracion(usuario),0.1)
            respuesta = json.loads(respuestatexto)
            print(respuesta)
