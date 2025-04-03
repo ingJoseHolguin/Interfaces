@@ -79,14 +79,13 @@ if __name__ == "__main__":
             print(tree)          
             
         sem_string = str(tree.label()['SEM'])
-        letters_only = ''.join(char for char in sem_string if char.isalpha())
+        quitarsignos = ''.join(char for char in sem_string if char.isalpha())
 
-        lite.text_to_speech(letters_only)
-
-        print(tree.label()['SEM'])
+        lite.text_to_speech(quitarsignos)
         time.sleep(1)
         pywhatkit.playonyt(tree.label()['SEM'])
         
     except ValueError as e:
-        lite.text_to_speech("Comando no reconocido.")
+        lite.text_to_speech("Co"
+        "mando no reconocido.")
         print(f"⚠️ Error: {e}")
