@@ -118,7 +118,7 @@ model.add(Dropout(0.25, seed=21))
 model.add(layers.Dense(6, activation='softmax')) 
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
-model.fit(X_train, y_train, epochs=4, batch_size=64, validation_data=(X_test, y_test), verbose=1)
+model.fit(X_train, y_train, epochs=20, batch_size=64, validation_data=(X_test, y_test), verbose=1)
 
 # evaluate the keras model
 _, accuracy = model.evaluate(X_data, y_data)
