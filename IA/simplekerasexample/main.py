@@ -9,7 +9,7 @@ from tensorflow.keras import Input
 # load the dataset
 dataset = loadtxt('simplekerasexample/pima-indians-diabetes.csv', delimiter=',')
 
-# split into input (X) and output (y) variables
+# split into input (X) and output (y) variablesde
 X = dataset[:,0:8]
 y = dataset[:,8]
 
