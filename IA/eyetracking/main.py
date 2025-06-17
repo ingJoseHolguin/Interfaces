@@ -13,8 +13,8 @@ pygame.init()
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
-radius=15
-
+# Definir el radio como una constante global
+radius = 15
 
 screen_width = pyautogui.size()[0]  
 screen_height = pyautogui.size()[1] 
@@ -22,18 +22,21 @@ print(f"Screen dimensions: {screen_width}x{screen_height}")
 
 # Definir puntos de calibración
 calibration_points = [
-    (radius , radius ),                                 
+    (radius, radius),                                 
     (screen_width - radius, radius),                  
     (screen_width - radius, screen_height - radius),  
     (radius, screen_height - radius),                 
     (screen_width // 2, screen_height // 2)   
 ]
 
-def draw_calibration_point(position, screen, radius ):
+# Hay dos opciones para corregir el error:
+# OPCIÓN 1: Modificar la función para que use el radio global
+def draw_calibration_point(position, screen):
     """Dibujar un punto de calibración en la pantalla"""
     screen.fill(BLACK)
     pygame.draw.circle(screen, WHITE, position, radius + 5)
     pygame.display.flip()
+
 
 def run_calibration():
     """Ejecutar el proceso de calibración mostrando puntos en la pantalla"""
@@ -43,16 +46,16 @@ def run_calibration():
     # Para cada punto de calibración
     for point_idx, point in enumerate(calibration_points):
         print(f"Mostrando punto {point_idx+1}: {point}")
+
         draw_calibration_point(point, screen)
-        
+       
         start_time = time.time()
         while time.time() - start_time < 3:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                     pygame.quit()
-                    return
+                    return False
         
-
         screen.fill(BLACK)
         font = pygame.font.Font(None, 36)
         text = font.render(f"Punto {point_idx+1} completado", True, WHITE)
