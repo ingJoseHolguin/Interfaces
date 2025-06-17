@@ -7,7 +7,7 @@ import subprocess
 import webbrowser
 import os
 import time
-import threading
+
 
 class AsistenteVoz:
     def __init__(self):
@@ -28,11 +28,11 @@ class AsistenteVoz:
         # Estado del asistente
         self.escuchando = True
         
-        print("🤖 Asistente de voz iniciado. Di 'hola asistente' para comenzar.")
+        print("Asistente de voz iniciado. Di 'hola asistente' para comenzar.")
     
     def configurar_voz(self):
         """Configura la voz del asistente"""
-        self.tts_engine.setProperty("rate", 150)
+        self.tts_engine.setProperty("rate", 180)
         voices = self.tts_engine.getProperty("voices")
         
         for voice in voices:
@@ -42,7 +42,7 @@ class AsistenteVoz:
     
     def hablar(self, texto):
         """Convierte texto a voz"""
-        print(f"🤖 Asistente: {texto}")
+        print(f"Asistente: {texto}")
         self.tts_engine.say(texto)
         self.tts_engine.runAndWait()
     
@@ -64,7 +64,8 @@ class AsistenteVoz:
         """Consulta al modelo LLM"""
         model = self.identificar_modelos()
         if not model:
-            return "Error: No se puede conectar con LM Studio"
+            # Respuestas básicas sin IA cuando LM Studio no está disponible
+            return self.respuesta_basica(mensaje)
         
         # Agregar contexto sobre comandos disponibles
         contexto_sistema = """Eres un asistente de voz útil. Puedes ayudar con información general y también controlar la computadora. 
@@ -113,7 +114,77 @@ class AsistenteVoz:
             else:
                 return f"Error del servidor: {respuesta.status_code}"
         except Exception as e:
-            return f"Error de conexión: {str(e)}"
+            return self.respuesta_basica(mensaje)
+    
+    def respuesta_basica(self, mensaje):
+        """Respuestas básicas cuando no hay LLM disponible"""
+        mensaje_lower = mensaje.lower()
+        
+        # Comandos de sistema
+        if any(word in mensaje_lower for word in ["abre", "abrir", "ejecuta"]):
+            if "navegador" in mensaje_lower or "browser" in mensaje_lower:
+                return "[COMANDO]ABRIR_NAVEGADOR[/COMANDO] Perfecto, abriendo el navegador web."
+            elif "word" in mensaje_lower:
+                return "[COMANDO]ABRIR_WORD[/COMANDO] Abriendo Microsoft Word para ti."
+            elif "excel" in mensaje_lower:
+                return "[COMANDO]ABRIR_EXCEL[/COMANDO] Abriendo Microsoft Excel."
+            elif "calculadora" in mensaje_lower:
+                return "[COMANDO]ABRIR_CALCULADORA[/COMANDO] Abriendo la calculadora."
+            elif "notepad" in mensaje_lower or "bloc" in mensaje_lower:
+                return "[COMANDO]ABRIR_NOTEPAD[/COMANDO] Abriendo el bloc de notas."
+        
+        # Búsquedas
+        elif "busca" in mensaje_lower or "buscar" in mensaje_lower:
+            # Extraer qué buscar
+            terminos_busqueda = mensaje_lower.replace("busca", "").replace("buscar", "").strip()
+            if terminos_busqueda:
+                return f"[COMANDO]BUSCAR:{terminos_busqueda}[/COMANDO] Buscando '{terminos_busqueda}' en Google."
+            else:
+                return "¿Qué quieres que busque?"
+        
+        # Control de volumen
+        elif "volumen" in mensaje_lower:
+            if "sube" in mensaje_lower or "subir" in mensaje_lower or "alto" in mensaje_lower:
+                return "[COMANDO]VOLUMEN_SUBIR[/COMANDO] Subiendo el volumen del sistema."
+            elif "baja" in mensaje_lower or "bajar" in mensaje_lower or "bajo" in mensaje_lower:
+                return "[COMANDO]VOLUMEN_BAJAR[/COMANDO] Bajando el volumen del sistema."
+            elif "silencio" in mensaje_lower or "mute" in mensaje_lower:
+                return "[COMANDO]VOLUMEN_SILENCIAR[/COMANDO] Silenciando el audio del sistema."
+        
+        # Saludos y conversación básica
+        elif any(word in mensaje_lower for word in ["hola", "buenos días", "buenas tardes", "buenas noches"]):
+            return "¡Hola! Soy tu asistente de voz. Puedo ayudarte a controlar tu computadora o buscar información. ¿En qué puedo ayudarte?"
+        
+        elif any(word in mensaje_lower for word in ["cómo estás", "qué tal", "como estas"]):
+            return "Estoy funcionando perfectamente y listo para ayudarte. ¿Qué necesitas que haga?"
+        
+        elif any(word in mensaje_lower for word in ["gracias", "muy bien", "perfecto"]):
+            return "¡De nada! Estoy aquí para ayudarte cuando lo necesites."
+        
+        elif any(word in mensaje_lower for word in ["chiste", "broma", "diversión"]):
+            chistes = [
+                "¿Por qué los programadores prefieren el modo oscuro? Porque la luz atrae a los bugs.",
+                "¿Cómo llamas a un programador que no documenta su código? Un arqueólogo del futuro.",
+                "¿Por qué Python es como un buen chiste? Porque es fácil de entender."
+            ]
+            import random
+            return random.choice(chistes)
+        
+        elif "hora" in mensaje_lower or "tiempo" in mensaje_lower:
+            import datetime
+            ahora = datetime.datetime.now()
+            return f"Son las {ahora.strftime('%H:%M')} del {ahora.strftime('%d de %B de %Y')}."
+        
+        elif "ayuda" in mensaje_lower or "qué puedes hacer" in mensaje_lower:
+            return """Puedo ayudarte con:
+            • Abrir aplicaciones: 'Abre Word', 'Abre el navegador'
+            • Buscar en Google: 'Busca recetas de pasta'
+            • Controlar volumen: 'Sube el volumen'
+            • Conversación básica y chistes
+            • Decirte la hora actual"""
+        
+        else:
+            return "Entiendo que quieres decirme algo, pero sin el LM Studio solo puedo ayudarte con comandos básicos. Di 'ayuda' para ver qué puedo hacer."
     
     def ejecutar_comando(self, comando):
         """Ejecuta comandos del sistema"""
@@ -123,11 +194,13 @@ class AsistenteVoz:
                 return "Abriendo navegador web"
             
             elif comando == "ABRIR_WORD":
-                subprocess.Popen(["winword"])
+                excel_path = r"C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE"
+                subprocess.Popen([excel_path])
                 return "Abriendo Microsoft Word"
             
             elif comando == "ABRIR_EXCEL":
-                subprocess.Popen(["excel"])
+                excel_path = r"C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE"
+                subprocess.Popen([excel_path])
                 return "Abriendo Microsoft Excel"
             
             elif comando == "ABRIR_CALCULADORA":
@@ -190,7 +263,7 @@ class AsistenteVoz:
                          input=True, frames_per_buffer=8192)
         stream.start_stream()
         
-        print("🎤 Escuchando... Di algo:")
+        print("Escuchando... Di algo:")
         
         while self.escuchando:
             try:
@@ -199,12 +272,12 @@ class AsistenteVoz:
                     result = self.recognizer.Result()
                     texto = json.loads(result)["text"]
                     if texto:
-                        print(f"👤 Usuario: {texto}")
+                        print(f"Usuario: {texto}")
                         return texto
                 else:
                     partial_result = json.loads(self.recognizer.PartialResult())["partial"]
                     if partial_result:
-                        print(f"🎤 Escuchando: {partial_result}", end="\r")
+                        print(f"Escuchando: {partial_result}", end="\r")
             except Exception as e:
                 print(f"Error en reconocimiento de voz: {e}")
                 time.sleep(0.1)
@@ -220,19 +293,17 @@ class AsistenteVoz:
         
         while True:
             try:
-                # Escuchar entrada del usuario
                 texto_usuario = self.escuchar_voz()
                 
                 if not texto_usuario:
                     continue
                 
-                # Comandos especiales para controlar el asistente
                 if "adiós asistente" in texto_usuario.lower() or "cerrar asistente" in texto_usuario.lower():
                     self.hablar("Hasta luego. Que tengas un buen día.")
                     break
                 
                 elif "silencio" in texto_usuario.lower() or "cállate" in texto_usuario.lower():
-                    print("🤖 Asistente en modo silencioso. Di 'hola asistente' para reactivar.")
+                    print("Asistente en modo silencioso. Di 'hola asistente' para reactivar.")
                     while True:
                         texto = self.escuchar_voz()
                         if texto and "hola asistente" in texto.lower():
@@ -240,26 +311,23 @@ class AsistenteVoz:
                             break
                     continue
                 
-                # Procesar con LLM
-                print("🧠 Procesando...")
+                print("Procesando...")
                 respuesta_llm = self.consultar_llm(texto_usuario)
                 
-                # Procesar comandos y responder
                 respuesta_final = self.procesar_respuesta(respuesta_llm)
                 self.hablar(respuesta_final)
                 
             except KeyboardInterrupt:
-                print("\n👋 Cerrando asistente...")
+                print("\nCerrando asistente...")
                 self.hablar("Hasta luego")
                 break
             except Exception as e:
                 print(f"Error: {e}")
                 self.hablar("Disculpa, tuve un problema. ¿Puedes repetir?")
 
-# Función principal
 def main():
     print("=" * 60)
-    print("🤖 ASISTENTE DE VOZ CON CONTROL DE PC")
+    print(" ASISTENTE DE VOZ CON CONTROL DE PC")
     print("=" * 60)
     print("Características:")
     print("• Reconocimiento de voz en español")
@@ -280,19 +348,26 @@ def main():
     print("• 'Cuéntame un chiste'")
     print("=" * 60)
     
-    # Verificar que LM Studio esté corriendo
     try:
         response = requests.get("http://localhost:1234/api/v0/models", timeout=5)
         if response.status_code != 200:
             print("⚠️  ADVERTENCIA: LM Studio no parece estar ejecutándose.")
-            print("   Asegúrate de tener LM Studio abierto en el puerto 1234.")
-            return
+            print("   El asistente funcionará solo con comandos básicos.")
+            respuesta = input("¿Continuar de todos modos? (s/n): ")
+            if respuesta.lower() != 's':
+                return
     except:
-        print("❌ ERROR: No se puede conectar con LM Studio.")
-        print("   Por favor, inicia LM Studio antes de ejecutar este programa.")
-        return
+        print(" ERROR: No se puede conectar con LM Studio.")
+        print("   SOLUCIÓN:")
+        print("   1. Abre LM Studio")
+        print("   2. Carga un modelo")
+        print("   3. Ve a 'Local Server' y haz clic en 'Start Server'")
+        print("   4. Verifica que diga 'Server running on port 1234'")
+        print()
+        respuesta = input("¿Continuar sin IA? El asistente funcionará solo con comandos (s/n): ")
+        if respuesta.lower() != 's':
+            return
     
-    # Iniciar asistente
     asistente = AsistenteVoz()
     asistente.ejecutar()
 
