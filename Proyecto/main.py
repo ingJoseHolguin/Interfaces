@@ -289,7 +289,7 @@ class AsistenteVoz:
     
     def ejecutar(self):
         """Bucle principal del asistente"""
-        self.hablar("Hola, soy tu asistente de voz. ¿En qué puedo ayudarte?")
+        self.hablar("Hola, soy tu asistente virtual comandado por voz. ¿En qué puedo ayudarte?")
         
         while True:
             try:

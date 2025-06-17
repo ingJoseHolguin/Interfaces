@@ -56,7 +56,6 @@ if __name__ == "__main__":
     TV[SEM=<\\x\\y.reproduce(x,y)>] -> "reproduce"
     VP[SEM=<\\x.?v(x, ?comp)>] -> TV[SEM=?v] COMP[SEM=?comp]
     COMP[SEM=<temerarios>] -> "temerarios"
-
     """
 
     grammar = grammar.FeatureGrammar.fromstring(grammar_text)
@@ -65,9 +64,9 @@ if __name__ == "__main__":
     print("🎙️ Habla ahora... ")
     ("Habla ahora...")
     
-    #text = recognition_lite.recognition_lite()
+    text = recognition_lite.recognition_lite()
     #text = "computador Reproduce shakira"
-    text = "computador Reproduce temerarios"
+    #text = "computador Reproduce temerarios"
     print("Entrada reconocida: >>>", text.lower())
 
     tokens = text.lower().split()
